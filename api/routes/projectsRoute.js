@@ -90,4 +90,14 @@ router.delete('/:id', validateProjectId, (req,res) => {
     .catch(err => res.status(500).json({ message: "error retrieving project for deletion" }))
 })
 
+// @@@@@@@@@@ PUT request @@@@@@@@@@
+router.put('/:id', validateProjectId, validateProject, (req,res) => {
+    const { id } = req.params
+    const updateProject = req.body
+
+    projDB.update(id, updateProject)
+    .then(proj => res.json(proj))
+    .catch(err => res.status(500).json({ message: "error retrieving project to update" }))
+})
+
 module.exports = router
