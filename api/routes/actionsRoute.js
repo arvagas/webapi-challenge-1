@@ -46,7 +46,7 @@ router.get('/:id', validateActionId, (req,res) => {
 
     actDB.get(id)
     .then(action => res.json(action))
-    .catch(err => res.status(500).json({ message: "error retrieving specific project" }))
+    .catch(err => res.status(500).json({ message: "error retrieving specific action" }))
 })
 
 // @@@@@@@@@@ POST request @@@@@@@@@@
@@ -55,7 +55,20 @@ router.post('/', validateAction, (req, res) => {
 
     actDB.insert(newAction)
     .then(act => res.status(201).json(act))
-    .catch(err => res.status(500).json({ message: "error adding project" }))
+    .catch(err => res.status(500).json({ message: "error adding action" }))
+})
+
+// @@@@@@@@@@ DELETE request @@@@@@@@@@
+router.delete('/:id', validateActionId, (req, res) => {
+    const { id } = req.params
+
+    actDB.get(id)
+    .then(delAction => {
+        actDB.remove(id)
+        .then(proj => res.json(delAction))
+        .catch(err => res.status(500).json({ message: "error deleting action" }))
+    })
+    .catch(err => res.status(500).json({ message: "error retrieving action for deletion" }))
 })
 
 module.exports = router
