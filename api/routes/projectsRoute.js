@@ -1,19 +1,36 @@
 const express = require('express')
 
 const projDB = require('../../data/helpers/projectModel')
+const actDB = require('../../data/helpers/actionModel')
 
 const router = express.Router()
 
 // @@@@@@@@@@ Custom Middleware @@@@@@@@@@
-function validateProjectId (req, res, next) {
+function validateProjectId(req, res, next) {
     const { id } = req.params
 
     projDB.get(id)
     .then(userId => {
         if (userId) next()
-        else res.status(404).json({ message: "invalid project id" })
+        else res.status(400).json({ message: "invalid project id" })
     })
     .catch(err => res.status(500).json({ message: "error validating project id" }))
+}
+
+function validateProject(req, res, next) {
+    const proj = req.body
+
+    if (!proj) res.status(404).json({ message: "missing project data" })
+    else if (!proj.name || !proj.description) res.status(404).json({ message: "missing required project name or description" })
+    else if (proj && proj.name && proj.description) next()
+}
+
+function validateAction(req, res, next) {
+    const action = req.body
+
+    if (!action) res.status(404).json({ message: "missing action data" })
+    else if (!action.notes || !action.description) res.status(404).json({ message: "missing required action notes or description" })
+    else if (action && action.notes && action.description) next()
 }
 
 // @@@@@@@@@@ GET request @@@@@@@@@@
@@ -40,6 +57,24 @@ router.get('/:id/actions', validateProjectId, (req,res) => {
     projDB.getProjectActions(id)
     .then(projectActions => res.json(projectActions))
     .catch(err => res.status(500).json({ message: "error retrieving specific project" }))
+})
+
+// @@@@@@@@@@ POST request @@@@@@@@@@
+router.post('/', validateProject, (req,res) => {
+    const newProject = req.body
+
+    projDB.insert(newProject)
+    .then(proj => res.status(201).json(proj))
+    .catch(err => res.status(500).json({ message: "error adding project" }))
+})
+
+router.post('/:id', validateProjectId, validateAction, (req,res) => {
+    const { id } = req.params
+    const newAction = { project_id: id, ...req.body }
+
+    actDB.insert(newAction)
+    .then(act => res.status(201).json(act))
+    .catch(err => res.status(500).json({ message: "error adding action to project" }))
 })
 
 module.exports = router
