@@ -77,4 +77,17 @@ router.post('/:id', validateProjectId, validateAction, (req,res) => {
     .catch(err => res.status(500).json({ message: "error adding action to project" }))
 })
 
+// @@@@@@@@@@ DELETE request @@@@@@@@@@
+router.delete('/:id', validateProjectId, (req,res) => {
+    const { id } = req.params
+
+    projDB.get(id)
+    .then(delProject => {
+        projDB.remove(id)
+        .then(proj => res.json(delProject))
+        .catch(err => res.status(500).json({ message: "error deleting project" }))
+    })
+    .catch(err => res.status(500).json({ message: "error retrieving project for deletion" }))
+})
+
 module.exports = router
