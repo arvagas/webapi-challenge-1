@@ -17,7 +17,7 @@ server.use(logger)
 
 // Route handling
 server.use('/projects', projectsRoute)
-server.use('/action', actionsRoute)
+server.use('/actions', actionsRoute)
 
 // Hello World test
 server.get('/', (req,res) => {
