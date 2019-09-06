@@ -71,4 +71,14 @@ router.delete('/:id', validateActionId, (req, res) => {
     .catch(err => res.status(500).json({ message: "error retrieving action for deletion" }))
 })
 
+// @@@@@@@@@@ PUT request @@@@@@@@@@
+router.put('/:id', validateActionId, validateAction, (req,res) => {
+    const { id } = req.params
+    const updateAction = req.body
+
+    actDB.update(id, updateAction)
+    .then(act => res.json(act))
+    .catch(err => res.status(500).json({ message: "error retrieving action to update" }))
+})
+
 module.exports = router
